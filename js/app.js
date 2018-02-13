@@ -131,6 +131,7 @@ var ViewModel = function() {
       self.mapUnavailable(true);
     }
   }();
+
 //******************************************************************************************
 
     /*Knockout computed observable will filter and return items that match,
@@ -140,7 +141,16 @@ var ViewModel = function() {
       return marker.title.toLowerCase().indexOf(self.query().toLowerCase()) !== -1;
     });
   }, self);
-
+  self.filteredArray.subscribe(function() {
+      var diffArray = ko.utils.compareArrays(self.markerArray(), self.filteredArray());
+      ko.utils.arrayForEach(diffArray, function(marker) {
+        if (marker.status === 'deleted') {
+          marker.value.setMap(null);
+        } else {
+          marker.value.setMap(map);
+        }
+      });
+    });
 
   //Highlight map marker if list item is clicked.
   self.selectItem = function(listItem) {
@@ -151,6 +161,7 @@ var ViewModel = function() {
   self.toggleList = function() {
     self.showList(!self.showList());
   };
+
 
 
   // Helper function to check viewport width, called only on initialization of map.
